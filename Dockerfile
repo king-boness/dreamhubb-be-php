@@ -21,9 +21,6 @@ RUN cp .env.example .env || true
 # Vygenerujeme Laravel APP key
 RUN php artisan key:generate || true
 
-# Cache pre konfiguráciu a routy
-RUN php artisan config:cache && php artisan route:cache && php artisan view:cache || true
-
 # Nastavíme oprávnenia
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
