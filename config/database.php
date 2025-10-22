@@ -26,7 +26,6 @@ return [
     | Of course, examples of configuring each database platform that is
     | supported by Laravel is shown below to make development simple.
     |
-    |
     | All database work in Laravel is done through the PHP PDO facilities
     | so make sure you have the driver for your particular database of
     | choice installed on your machine before you begin development.
@@ -76,9 +75,12 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'require'),
-            'options' => extension_loaded('pdo_pgsql') ? array_filter([
-                PDO::PGSQL_ATTR_SSL_MODE => env('DB_SSLMODE', 'require'),
-            ]) : [],
+            // 🩵 FIX: bezpečná kontrola PDO konštánt pre build
+            'options' => (extension_loaded('pdo_pgsql') && defined('PDO::PGSQL_ATTR_SSL_MODE'))
+                ? array_filter([
+                    PDO::PGSQL_ATTR_SSL_MODE => env('DB_SSLMODE', 'require'),
+                ])
+                : [],
         ],
 
         'sqlsrv' => [
