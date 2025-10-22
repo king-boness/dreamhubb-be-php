@@ -4,30 +4,31 @@ FROM php:8.2-apache
 # Nastavíme pracovný adresár
 WORKDIR /var/www/html
 
-# Skopírujeme composer.json a nainštalujeme composer
-COPY composer.json composer.lock ./
+# Nainštalujeme systémové balíčky a rozšírenia PHP
 RUN apt-get update && apt-get install -y unzip git libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql zip \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer install --no-dev --optimize-autoloader
+    && docker-php-ext-install pdo pdo_mysql zip
 
-# Skopírujeme zvyšok projektu
+# Skopírujeme celý projekt (vrátane artisan, app, routes, atď.)
 COPY . .
 
-# Vytvoríme .env, ak neexistuje
+# Nainštalujeme Composer a balíčky
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer install --no-dev --optimize-autoloader
+
+# Ak chýba .env, vytvoríme ho z .env.example
 RUN cp .env.example .env || true
 
-# Vygenerujeme Laravel APP key (ak ešte nie je)
+# Vygenerujeme Laravel APP key
 RUN php artisan key:generate || true
 
-# Cache pre zlepšenie výkonu
+# Cache pre konfiguráciu a routy
 RUN php artisan config:cache && php artisan route:cache && php artisan view:cache || true
 
-# Nastavíme oprávnenia pre Laravel
+# Nastavíme oprávnenia
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Nastavíme port, ktorý Render očakáva
+# Nastavíme port
 EXPOSE 10000
 
-# Spustíme aplikáciu cez php artisan serve
+# Spustíme aplikáciu
 CMD php artisan serve --host 0.0.0.0 --port 10000
