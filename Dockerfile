@@ -1,24 +1,20 @@
-# Používame PHP s Apache
+# Použijeme oficiálny PHP 8.2 image s Apache
 FROM php:8.2-apache
 
-# Povoliť mod_rewrite
+# Nastavime pracovný adresár
+WORKDIR /var/www/html
+
+# Zapneme Apache mod_rewrite pre Laravel routes
 RUN a2enmod rewrite
 
-# Nastaviť DocumentRoot na public
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+# Nastavenie DocumentRoot pre Laravel /public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
-
-# Povoliť .htaccess
 RUN echo '<Directory /var/www/html/public>\n\
     AllowOverride All\n\
     Require all granted\n\
-</Directory>' > /etc/apache2/conf-available/laravel.conf \
-    && a2enconf laravel
+</Directory>' > /etc/apache2/conf-available/laravel.conf && a2enconf laravel
 
-# Nastaviť pracovný adresár
-WORKDIR /var/www/html
-
-# Inštalácia systémových balíkov a PHP rozšírení
+# Inštalácia systémových knižníc (vrátane SSL a PostgreSQL)
 RUN apt-get update && apt-get install -y \
     unzip \
     git \
@@ -30,32 +26,27 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure pgsql --with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo_pgsql pgsql zip
 
-    # Force refresh CA certificates (fix for SSL connection issues to PostgreSQL)
+# 🔒 Dôležité — Refresh certifikátov pre SSL pripojenie (Render Postgres potrebuje)
 RUN update-ca-certificates && chmod 644 /etc/ssl/certs/ca-certificates.crt
 
-# Skopírovať projekt
+# Skopíruj projektové súbory
 COPY . .
 
-# Inštalácia Composeru a závislostí
+# Inštalácia Composeru a Laravel závislostí
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
     && composer dump-autoload -o
 
-# Vytvoriť .env zo vzoru, ak chýba (Render injektne premenné pri štarte)
-RUN cp .env.example .env || true
-
-# Laravel cache a key fixy (nech nepadajú počas buildu)
-RUN php artisan key:generate --force || true \
-    && php artisan config:clear || true \
-    && php artisan cache:clear || true \
-    && php artisan route:clear || true \
-    && php artisan view:clear || true \
-    && php artisan optimize:clear || true
-
-# Povolenia
+# Nastavenie práv
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+    && chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Exponovať port a spustiť Apache
+# Nastavenie Laravelu
+RUN php artisan config:clear || true \
+    && php artisan cache:clear || true
+
+# Port (Render očakáva 80)
 EXPOSE 80
+
+# Spustenie Apache
 CMD ["apache2-foreground"]
