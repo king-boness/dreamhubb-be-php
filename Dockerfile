@@ -31,13 +31,15 @@ COPY . .
 
 # Inštalácia Composeru a závislostí
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist || true
+    && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
+    && composer dump-autoload -o
 
-# Vytvoriť .env zo vzoru (Render injectne premenné pri štarte)
+# Vytvoriť .env zo vzoru, ak chýba (Render injektne premenné pri štarte)
 RUN cp .env.example .env || true
 
-# Vyčistiť a optimalizovať Laravel (aj bez APP_KEY to prežije)
-RUN php artisan config:clear || true \
+# Laravel cache a key fixy (nech nepadajú počas buildu)
+RUN php artisan key:generate --force || true \
+    && php artisan config:clear || true \
     && php artisan cache:clear || true \
     && php artisan route:clear || true \
     && php artisan view:clear || true \
