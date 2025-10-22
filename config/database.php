@@ -72,14 +72,11 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-            'sslmode' => env('DB_SSLMODE', 'require'),
-            'options' => extension_loaded('pdo_pgsql') ? array_filter([
-                PDO::ATTR_TIMEOUT => 5,
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                // ⚠️ Tu použijeme stringové kľúče namiesto konštánt
+            'sslmode' => 'require',
+            'options' => [
                 'sslmode' => 'require',
                 'sslrootcert' => '/etc/ssl/certs/ca-certificates.crt',
-            ]) : [],
+            ],
         ],
 
         'sqlsrv' => [

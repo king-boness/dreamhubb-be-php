@@ -30,6 +30,9 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure pgsql --with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo_pgsql pgsql zip
 
+    # Force refresh CA certificates (fix for SSL connection issues to PostgreSQL)
+RUN update-ca-certificates && chmod 644 /etc/ssl/certs/ca-certificates.crt
+
 # Skopírovať projekt
 COPY . .
 
