@@ -76,12 +76,11 @@ return [
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
                 PDO::ATTR_TIMEOUT => 5,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::PGSQL_ATTR_SSL_MODE => 'require',
-                PDO::PGSQL_ATTR_SSL_ROOT_CERT => '/etc/ssl/certs/ca-certificates.crt',
-            PDO::PGSQL_ATTR_DISABLE_PREPARES => true,
+                // ⚠️ Tu použijeme stringové kľúče namiesto konštánt
+                'sslmode' => 'require',
+                'sslrootcert' => '/etc/ssl/certs/ca-certificates.crt',
             ]) : [],
         ],
-
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',
