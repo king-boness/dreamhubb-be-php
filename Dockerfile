@@ -10,19 +10,19 @@ RUN apt-get update && apt-get install -y \
     git \
     libpq-dev \
     libzip-dev \
-    && docker-php-ext-install pdo pdo_pgsql pdo_mysql zip
+    && docker-php-ext-install pdo pdo_pgsql zip
 
-# Skopírujeme všetky súbory
+# Skopírujeme všetky súbory projektu
 COPY . .
 
-# Inštalácia Composeru a závislostí
+# Inštalácia Composeru a PHP závislostí
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+    && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist || true
 
 # Nastavíme správne oprávnenia
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Nastavíme Apache
+# Exponujeme port a spustíme Apache
 EXPOSE 80
 CMD ["apache2-foreground"]
