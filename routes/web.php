@@ -38,3 +38,19 @@ Route::get('/email/verify', function () {
 Route::get('/email/verify/success', function () {
     return view('email.success', ['name' => 'aaa']);
 })->name('verification.success');
+
+use Illuminate\Support\Facades\DB;
+
+Route::get('/db-test', function () {
+    try {
+        DB::connection()->getPdo();
+        return response()->json([
+            'status' => '✅ Database connection successful!'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => '❌ Database connection failed',
+            'error' => $e->getMessage()
+        ]);
+    }
+});
