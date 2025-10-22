@@ -14,8 +14,14 @@ RUN apt-get update && apt-get install -y unzip git libzip-dev \
 # Skopírujeme zvyšok projektu
 COPY . .
 
+# Vytvoríme .env, ak neexistuje
+RUN cp .env.example .env || true
+
 # Vygenerujeme Laravel APP key (ak ešte nie je)
 RUN php artisan key:generate || true
+
+# Cache pre zlepšenie výkonu
+RUN php artisan config:cache && php artisan route:cache && php artisan view:cache || true
 
 # Nastavíme oprávnenia pre Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
