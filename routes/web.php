@@ -58,3 +58,8 @@ Route::get('/clear-cache', function () {
     Artisan::call('optimize:clear');
     return '✅ All caches cleared successfully.';
 });
+
+use App\Http\Controllers\HealthController;
+
+Route::get('/health', [HealthController::class, 'health']);
+Route::get('/db-test', [HealthController::class, 'dbTest']);
