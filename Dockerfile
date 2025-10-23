@@ -7,12 +7,19 @@ WORKDIR /var/www/html
 # Zapneme Apache mod_rewrite pre Laravel routes
 RUN a2enmod rewrite
 
-# Nastavenie DocumentRoot pre Laravel /public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
-RUN echo '<Directory /var/www/html/public>\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>' > /etc/apache2/conf-available/laravel.conf && a2enconf laravel
+# Nastavenie DocumentRoot a Laravel povolení
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf && \
+    echo '<VirtualHost *:80>\n\
+        DocumentRoot /var/www/html/public\n\
+        <Directory /var/www/html/public>\n\
+            Options Indexes FollowSymLinks\n\
+            AllowOverride All\n\
+            Require all granted\n\
+        </Directory>\n\
+        ErrorLog ${APACHE_LOG_DIR}/error.log\n\
+        CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
+    </VirtualHost>' > /etc/apache2/sites-available/laravel.conf && \
+    a2ensite laravel && a2dissite 000-default
 
 # Inštalácia systémových knižníc (vrátane SSL a PostgreSQL)
 RUN apt-get update && apt-get install -y \
