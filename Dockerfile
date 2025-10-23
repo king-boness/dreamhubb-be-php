@@ -50,8 +50,8 @@ RUN chown -R www-data:www-data /var/www/html \
 RUN php artisan config:clear || true \
     && php artisan cache:clear || true
 
-# Port (Render očakáva 80)
-EXPOSE 80
+# Port (Render očakáva 10000)
+EXPOSE 10000
 
-# Spustenie Apache
-CMD ["apache2-foreground"]
+# Spustenie Laravelu cez vstavaný PHP server
+CMD ["php", "-S", "0.0.0.0:10000", "-t", "public"]
