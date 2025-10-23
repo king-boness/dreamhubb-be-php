@@ -1,7 +1,7 @@
 services:
   - type: web
     name: dreamhubb-be-buildpack
-    env: php
+    runtime: php
     plan: starter
     buildCommand: ""
     startCommand: "php -S 0.0.0.0:10000 -t public"
