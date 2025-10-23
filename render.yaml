@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: dreamhubb-be-buildpack
+    env: php
+    plan: starter
+    buildCommand: ""
+    startCommand: "php -S 0.0.0.0:10000 -t public"
+    autoDeploy: true
