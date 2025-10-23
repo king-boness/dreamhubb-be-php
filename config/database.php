@@ -72,11 +72,13 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-            'sslmode' => 'require',
-            'options' => [
-                'sslmode' => 'require',
-                'sslrootcert' => '/etc/ssl/certs/ca-certificates.crt',
-            ],
+            'sslmode' => 'verify-full',
+            'options' => extension_loaded('pdo_pgsql') ? array_filter([
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_TIMEOUT => 5,
+                PDO::PGSQL_ATTR_SSL_MODE => 'verify-full',
+                PDO::PGSQL_ATTR_SSL_ROOT_CERT => '/etc/ssl/certs/ca-certificates.crt',
+            ]) : [],
         ],
 
         'sqlsrv' => [
