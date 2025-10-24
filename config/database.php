@@ -65,7 +65,7 @@ return [
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => env('DB_HOST', 'dpg-dt3q9v5v7b73flue90a-a.oregon-postgres.render.com'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
@@ -77,7 +77,6 @@ return [
             'sslmode' => 'require',
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                // ⚠️ ŽIADNE PDO::PGSQL_ATTR_* — Render ich nemá
             ]) : [],
         ],
 
