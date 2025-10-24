@@ -4,11 +4,14 @@ services:
     env: docker
     plan: starter
     dockerfilePath: ""
+    dockerContext: .
     dockerCommand: |
-      apt-get update -y && \
-      apt-get install -y php php-cli php-mbstring unzip curl composer && \
-      composer install --no-dev --optimize-autoloader && \
-      php artisan key:generate && \
-      php artisan migrate --force || true && \
+      bash -c "
+      apt-get update -y &&
+      apt-get install -y php php-cli php-mbstring unzip curl git composer &&
+      composer install --no-dev --optimize-autoloader &&
+      php artisan key:generate &&
+      php artisan migrate --force || true &&
       php -S 0.0.0.0:10000 -t public
+      "
     autoDeploy: true
