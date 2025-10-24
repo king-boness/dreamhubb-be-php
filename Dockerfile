@@ -37,3 +37,6 @@ COPY . .
 
 # Spúšťací skript
 RUN chmod +x /app/start.sh
+
+# 🟢 TOTO JE DÔLEŽITÉ — spustí Laravel server pri štarte kontajnera
+CMD ["/bin/sh", "/app/start.sh"]
