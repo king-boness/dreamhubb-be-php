@@ -5,7 +5,6 @@ services:
     plan: starter
     dockerContext: .
     dockerCommand: |
-      /bin/sh -c '
       apk update &&
       apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git &&
       curl -sS https://getcomposer.org/installer | php &&
@@ -16,5 +15,4 @@ services:
       php artisan cache:clear || true &&
       php artisan migrate --force || true &&
       php -S 0.0.0.0:10000 -t public
-      '
     autoDeploy: true
