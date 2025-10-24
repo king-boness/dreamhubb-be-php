@@ -1,5 +1,6 @@
 #!/bin/sh
-cd /opt/render/project/src || exit
+
+# už žiadne: cd /opt/render/project/src || exit
 
 apk update
 apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git
