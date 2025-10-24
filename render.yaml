@@ -1,8 +1,12 @@
 services:
   - type: web
-    name: dreamhubb-be-buildpack
-    env: php
+    name: dreamhubb-be-php
+    env: docker
     plan: starter
-    buildCommand: ""
-    startCommand: "php -S 0.0.0.0:10000 -t public"
+    dockerCommand: |
+      apt-get update
+      apt-get install -y php php-cli php-mbstring unzip curl composer
+      composer install --no-dev --optimize-autoloader
+      php artisan key:generate
+      php -S 0.0.0.0:10000 -t public
     autoDeploy: true
