@@ -60,7 +60,6 @@ return [
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),
-            // 🔹 Render PostgreSQL hostname
             'host' => env('DB_HOST', 'dpg-dt3q9v5v7b73flue90a-a.oregon-postgres.render.com'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'forge'),
@@ -70,8 +69,10 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'schema' => 'public',
-            // 🔹 SSL je povinné pre Render Postgres
-            'sslmode' => 'verify-full',
+
+            // ✅ Render SSL fix
+            'sslmode' => 'require',
+
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]) : [],
