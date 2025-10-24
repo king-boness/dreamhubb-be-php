@@ -1,13 +1,12 @@
 #!/bin/sh
 
-# už žiadne: cd /opt/render/project/src || exit
-
 apk update
-apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git
 
+# Inštalácia Composeru
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 
+# Inštalácia PHP knižníc
 composer install --no-dev --optimize-autoloader
 
 php artisan key:generate || true
