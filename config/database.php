@@ -64,12 +64,12 @@ return [
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'dreamhubb_db_bhg3'),
             'username' => env('DB_USERNAME', 'dreamhubb_db_bhg3_user'),
-            'password' => env('DB_PASSWORD', 'tvoje_heslo_z_Render_DB'),
+            'password' => env('DB_PASSWORD', 'TVOJE_HESLO_Z_RENDERU'),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
             'schema' => 'public',
-            'sslmode' => 'prefer', // ✅ z "require" na "prefer"
+            'sslmode' => 'prefer', // 🔥 najdôležitejšie
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]) : [],
