@@ -3,7 +3,6 @@ services:
     name: dreamhubb-be-php
     env: docker
     plan: starter
-    dockerfilePath: ""
     dockerContext: .
     dockerCommand: |
       bash -c "
