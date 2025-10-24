@@ -1,4 +1,6 @@
-# 1️⃣ STAGE – build (Composer)
+# ==========================
+# 1️⃣ BUILD STAGE (Composer)
+# ==========================
 FROM composer:2 AS build
 
 WORKDIR /app
@@ -6,13 +8,15 @@ WORKDIR /app
 # Skopíruj Composer súbory
 COPY composer.json composer.lock ./
 
-# Inštaluj všetky balíky (bez dev)
+# Inštalácia závislostí
 RUN composer install --no-dev --optimize-autoloader
 
-# Skopíruj celý projekt
+# Skopíruj zvyšok projektu (vrátane Laravel súborov)
 COPY . .
 
-# 2️⃣ STAGE – runtime (PHP + Alpine)
+# ==========================
+# 2️⃣ RUNTIME STAGE (PHP)
+# ==========================
 FROM alpine:3.20
 
 RUN apk add --no-cache \
@@ -45,10 +49,10 @@ RUN ln -s /usr/bin/php82 /usr/bin/php
 
 WORKDIR /app
 
-# Skopíruj buildovaný Laravel (vrátane vendor/)
+# Tu sa skopíruje celý build vrátane vendor/
 COPY --from=build /app /app
 
-RUN chmod +x /app/start.sh
+RUN chmod +x /app/start.sh || true
 
-# Spusti migrácie a server
-CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000"]
+# Laravel migrácie + server
+CMD ["sh", "-c", "php artisan migrate --force || true && php artisan serve --host=0.0.0.0 --port=10000"]
