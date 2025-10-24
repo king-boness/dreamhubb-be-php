@@ -77,7 +77,6 @@ return [
             'sslmode' => 'require',
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::PGSQL_ATTR_SSL_MODE => 'require',
             ]) : [],
         ],
 

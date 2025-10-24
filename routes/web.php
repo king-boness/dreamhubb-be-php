@@ -72,4 +72,3 @@ Route::get('/db-check', function () {
         return "❌ Database connection failed: " . $e->getMessage();
     }
 });
-
