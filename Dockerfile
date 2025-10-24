@@ -5,14 +5,11 @@ FROM composer:2 AS build
 
 WORKDIR /app
 
-# Skopíruj Composer súbory
-COPY composer.json composer.lock ./
-
-# Inštalácia závislostí
-RUN composer install --no-dev --optimize-autoloader
-
-# Skopíruj zvyšok projektu (vrátane Laravel súborov)
+# Skopíruj celý projekt hneď na začiatku
 COPY . .
+
+# Inštalácia závislostí (bez dev)
+RUN composer install --no-dev --optimize-autoloader
 
 # ==========================
 # 2️⃣ RUNTIME STAGE (PHP)
@@ -49,10 +46,9 @@ RUN ln -s /usr/bin/php82 /usr/bin/php
 
 WORKDIR /app
 
-# Tu sa skopíruje celý build vrátane vendor/
+# Skopíruj všetko (vrátane vendor z build stage)
 COPY --from=build /app /app
 
 RUN chmod +x /app/start.sh || true
 
-# Laravel migrácie + server
 CMD ["sh", "-c", "php artisan migrate --force || true && php artisan serve --host=0.0.0.0 --port=10000"]
