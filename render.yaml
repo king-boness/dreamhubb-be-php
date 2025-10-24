@@ -4,14 +4,14 @@ services:
     env: docker
     plan: starter
     dockerContext: .
-    dockerCommand: >
-      sh -c "
-      apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git composer &&
-      composer install --no-dev --optimize-autoloader &&
-      php artisan key:generate || true &&
-      php artisan config:clear || true &&
-      php artisan cache:clear || true &&
-      php artisan migrate --force || true &&
+    dockerCommand: |
+      sh -c '
+      apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git composer
+      composer install --no-dev --optimize-autoloader
+      php artisan key:generate || true
+      php artisan config:clear || true
+      php artisan cache:clear || true
+      php artisan migrate --force || true
       php -S 0.0.0.0:10000 -t public
-      "
+      '
     autoDeploy: true
