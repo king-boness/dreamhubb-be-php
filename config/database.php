@@ -77,8 +77,12 @@ return [
             'sslmode' => 'require',
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_TIMEOUT => 5,
+                // 🔽 tu pridávame cestu k SSL certifikátu
+                defined('PDO::PGSQL_ATTR_SSL_ROOT_CERT') ? PDO::PGSQL_ATTR_SSL_ROOT_CERT : null => '/etc/ssl/certs/ca-certificates.crt',
             ]) : [],
         ],
+
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',
