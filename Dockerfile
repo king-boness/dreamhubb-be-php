@@ -36,11 +36,21 @@ RUN ln -s /usr/bin/php82 /usr/bin/php
 # Nastavenie pracovného adresára
 WORKDIR /app
 
-# Skopíruj celý projekt
+# Skopíruj composer.json a composer.lock (pre caching)
+COPY composer.json composer.lock ./
+
+# Inštaluj Composer (globálne)
+RUN curl -sS https://getcomposer.org/installer | php \
+    && mv composer.phar /usr/local/bin/composer
+
+# Inštaluj Laravel závislosti (bez dev balíkov)
+RUN composer install --no-dev --optimize-autoloader
+
+# Skopíruj zvyšok projektu
 COPY . .
 
 # Nastav práva pre štartovací skript
 RUN chmod +x /app/start.sh
 
-# Spúšťací príkaz pre Laravel server
+# Spúšťací príkaz (migrácie + Laravel server)
 CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000"]
