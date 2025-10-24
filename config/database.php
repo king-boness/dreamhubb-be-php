@@ -59,6 +59,7 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
+            'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'forge'),
@@ -67,13 +68,10 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-            'schema' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            'sslmode' => env('DB_SSLMODE', 'require'),
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
-            // Použijeme dynamický fallback, ak konštanty neexistujú
-            defined('PDO::PGSQL_ATTR_SSL_MODE') ? constant('PDO::PGSQL_ATTR_SSL_MODE') : null => env('PGSSLMODE', 'require'),
-            defined('PDO::PGSQL_ATTR_SSL_ROOT_CERT') ? constant('PDO::PGSQL_ATTR_SSL_ROOT_CERT') : null => env('PGSSLROOTCERT', '/etc/ssl/certs/ca-certificates.crt'),
-        ]) : [],
+                defined('PDO::PGSQL_ATTR_SSL_MODE') ? constant('PDO::PGSQL_ATTR_SSL_MODE') : null => 'require',
+            ]) : [],
         ],
 
         'sqlsrv' => [
