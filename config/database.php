@@ -74,7 +74,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'schema' => 'public',
-            'sslmode' => 'disable', // ⚠️ z "require" na "disable"
+            'sslmode' => 'require',
         ],
 
         'sqlsrv' => [
