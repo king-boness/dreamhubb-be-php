@@ -1,7 +1,7 @@
 # Používame Alpine ako základ
 FROM alpine:3.20
 
-# Inštalácia PHP + PostgreSQL + potrebných nástrojov + SSL certifikátov
+# Inštalácia PHP + PostgreSQL + nástrojov + SSL certifikátov
 RUN apk add --no-cache \
     php82 \
     php82-cli \
@@ -24,19 +24,20 @@ RUN apk add --no-cache \
     curl \
     git \
     unzip \
-    ca-certificates
+    ca-certificates \
+    openssl
+
+# Zaregistruj CA certifikáty (TOTO je kritické)
+RUN update-ca-certificates
 
 # Symbolický link na php
 RUN ln -s /usr/bin/php82 /usr/bin/php
 
-# Pracovný adresár
+# Nastavenie pracovného adresára
 WORKDIR /app
 
-# Skopírovanie projektu
+# Skopíruj celý projekt
 COPY . .
 
-# Spúšťací skript
+# Nastav práva pre štartovací skript
 RUN chmod +x /app/start.sh
-
-# 🟢 TOTO JE DÔLEŽITÉ — spustí Laravel server pri štarte kontajnera
-CMD ["/bin/sh", "/app/start.sh"]
