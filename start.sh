@@ -1,12 +1,10 @@
 #!/bin/sh
 
-apk update
-
 # Inštalácia Composeru
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 
-# Inštalácia PHP knižníc
+# Inštalácia PHP závislostí
 composer install --no-dev --optimize-autoloader
 
 php artisan key:generate || true
