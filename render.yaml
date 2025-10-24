@@ -4,8 +4,4 @@ services:
     env: docker
     plan: starter
     dockerContext: .
-    dockerCommand:
-      - /bin/sh
-      - -lc
-      - 'chmod +x ./start.sh && ./start.sh'
     autoDeploy: true
