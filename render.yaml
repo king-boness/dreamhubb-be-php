@@ -4,5 +4,5 @@ services:
     env: docker
     plan: starter
     dockerContext: .
-    dockerCommand: bash ./start.sh
+    dockerCommand: sh ./start.sh
     autoDeploy: true
