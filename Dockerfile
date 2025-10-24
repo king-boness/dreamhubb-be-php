@@ -1,7 +1,20 @@
-# Používame Alpine ako základ
+# 1️⃣ STAGE – build (Composer)
+FROM composer:2 AS build
+
+WORKDIR /app
+
+# Skopíruj Composer súbory
+COPY composer.json composer.lock ./
+
+# Inštaluj všetky balíky (bez dev)
+RUN composer install --no-dev --optimize-autoloader
+
+# Skopíruj celý projekt
+COPY . .
+
+# 2️⃣ STAGE – runtime (PHP + Alpine)
 FROM alpine:3.20
 
-# Inštalácia PHP + PostgreSQL + nástrojov + SSL certifikátov
 RUN apk add --no-cache \
     php82 \
     php82-cli \
@@ -27,30 +40,15 @@ RUN apk add --no-cache \
     ca-certificates \
     openssl
 
-# Zaregistruj CA certifikáty
 RUN update-ca-certificates
-
-# Symbolický link na php
 RUN ln -s /usr/bin/php82 /usr/bin/php
 
-# Nastavenie pracovného adresára
 WORKDIR /app
 
-# Skopíruj composer.json a composer.lock (pre caching)
-COPY composer.json composer.lock ./
+# Skopíruj buildovaný Laravel (vrátane vendor/)
+COPY --from=build /app /app
 
-# Inštaluj Composer (globálne)
-RUN curl -sS https://getcomposer.org/installer | php \
-    && mv composer.phar /usr/local/bin/composer
-
-# Inštaluj Laravel závislosti (bez dev balíkov)
-RUN composer install --no-dev --optimize-autoloader
-
-# Skopíruj zvyšok projektu
-COPY . .
-
-# Nastav práva pre štartovací skript
 RUN chmod +x /app/start.sh
 
-# Spúšťací príkaz (migrácie + Laravel server)
+# Spusti migrácie a server
 CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000"]
