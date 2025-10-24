@@ -63,3 +63,13 @@ use App\Http\Controllers\HealthController;
 
 Route::get('/health', [HealthController::class, 'health']);
 Route::get('/db-test', [HealthController::class, 'dbTest']);
+
+Route::get('/db-check', function () {
+    try {
+        DB::connection()->getPdo();
+        return "✅ Database connection successful!";
+    } catch (\Exception $e) {
+        return "❌ Database connection failed: " . $e->getMessage();
+    }
+});
+
