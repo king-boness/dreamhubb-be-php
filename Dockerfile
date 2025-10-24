@@ -27,7 +27,7 @@ RUN apk add --no-cache \
     ca-certificates \
     openssl
 
-# Zaregistruj CA certifikáty (TOTO je kritické)
+# Zaregistruj CA certifikáty
 RUN update-ca-certificates
 
 # Symbolický link na php
@@ -41,3 +41,6 @@ COPY . .
 
 # Nastav práva pre štartovací skript
 RUN chmod +x /app/start.sh
+
+# Spúšťací príkaz pre Laravel server
+CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000"]
