@@ -14,5 +14,5 @@ services:
       php artisan config:clear || true &&
       php artisan cache:clear || true &&
       php artisan migrate --force || true &&
-      php -S 0.0.0.0:10000 -t public"
+      php artisan serve --host=0.0.0.0 --port=10000"
     autoDeploy: true
