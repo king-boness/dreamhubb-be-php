@@ -1,17 +1,11 @@
 services:
   - type: web
     name: dreamhubb-be-php
-    env: docker
+    env: php
     plan: starter
-    dockerfilePath: ""
-    dockerContext: .
-    dockerCommand: |
-      bash -c "
-      apt-get update -y &&
-      apt-get install -y php php-cli php-mbstring unzip curl git composer &&
-      composer install --no-dev --optimize-autoloader &&
-      php artisan key:generate &&
-      php artisan migrate --force || true &&
-      php -S 0.0.0.0:10000 -t public
-      "
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      php artisan key:generate
+      php artisan migrate --force || true
+    startCommand: php -S 0.0.0.0:10000 -t public
     autoDeploy: true
