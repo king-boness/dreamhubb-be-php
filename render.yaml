@@ -4,16 +4,17 @@ services:
     env: docker
     plan: starter
     dockerContext: .
-    dockerCommand: |
-      set -e
-      apk update && \
-      apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git && \
-      curl -sS https://getcomposer.org/installer | php && \
-      mv composer.phar /usr/local/bin/composer && \
-      composer install --no-dev --optimize-autoloader && \
-      php artisan key:generate || true && \
-      php artisan config:clear || true && \
-      php artisan cache:clear || true && \
-      php artisan migrate --force || true && \
-      php -S 0.0.0.0:10000 -t public
+    dockerCommand: >
+      sh -c "
+        apk update &&
+        apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git &&
+        curl -sS https://getcomposer.org/installer | php &&
+        mv composer.phar /usr/local/bin/composer &&
+        composer install --no-dev --optimize-autoloader &&
+        php artisan key:generate || true &&
+        php artisan config:clear || true &&
+        php artisan cache:clear || true &&
+        php artisan migrate --force || true &&
+        php -S 0.0.0.0:10000 -t public
+      "
     autoDeploy: true
