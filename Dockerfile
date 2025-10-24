@@ -1,6 +1,7 @@
+# Používame Alpine ako základ
 FROM alpine:3.20
 
-# Inštaluj PHP 8.2 a všetky potrebné rozšírenia pre Laravel + Composer
+# Inštalácia PHP + PostgreSQL + potrebných nástrojov + SSL certifikátov
 RUN apk add --no-cache \
     php82 \
     php82-cli \
@@ -22,19 +23,17 @@ RUN apk add --no-cache \
     php82-iconv \
     curl \
     git \
-    unzip
+    unzip \
+    ca-certificates
 
-# Nastav alias, aby "php" spúšťalo PHP 8.2
+# Symbolický link na php
 RUN ln -s /usr/bin/php82 /usr/bin/php
 
-# Nastav pracovný priečinok
+# Pracovný adresár
 WORKDIR /app
 
-# Skopíruj všetky súbory projektu
+# Skopírovanie projektu
 COPY . .
 
-# Urob start.sh spustiteľný
+# Spúšťací skript
 RUN chmod +x /app/start.sh
-
-# Spúšťací príkaz
-CMD ["/bin/sh", "-lc", "./start.sh"]
