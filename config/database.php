@@ -70,8 +70,9 @@ return [
             'prefix_indexes' => true,
             'schema' => 'public',
 
-            // ✅ Render SSL fix
-            'sslmode' => 'require',
+            // ✅ Render PostgreSQL SSL fix
+            // "prefer" = použije SSL ak dostupné, ale nespadne na chýbajúcom certifikáte
+            'sslmode' => 'prefer',
 
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
