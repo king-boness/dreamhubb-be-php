@@ -75,6 +75,12 @@ return [
             'prefix_indexes' => true,
             'schema' => 'public',
             'sslmode' => 'require',
+            'options' => extension_loaded('pdo_pgsql') ? array_filter([
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_TIMEOUT => 5,
+                PDO::PGSQL_ATTR_SSL_MODE => 'require',
+                PDO::PGSQL_ATTR_SSL_ROOT_CERT => '/etc/ssl/certs/ca-certificates.crt',
+            ]) : [],
         ],
 
         'sqlsrv' => [
