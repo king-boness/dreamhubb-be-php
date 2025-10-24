@@ -4,8 +4,10 @@ services:
     env: php
     plan: starter
     buildCommand: |
-      composer install --no-dev --optimize-autoloader
-      php artisan key:generate
+      composer install --ignore-platform-reqs --no-dev --optimize-autoloader
+      php artisan key:generate || true
+      php artisan config:clear || true
+      php artisan cache:clear || true
       php artisan migrate --force || true
     startCommand: php -S 0.0.0.0:10000 -t public
     autoDeploy: true
