@@ -5,7 +5,9 @@ services:
     plan: starter
     dockerContext: .
     dockerCommand: |
-      apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git composer
+      apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git
+      curl -sS https://getcomposer.org/installer | php
+      mv composer.phar /usr/local/bin/composer
       composer install --no-dev --optimize-autoloader
       php artisan key:generate || true
       php artisan config:clear || true
