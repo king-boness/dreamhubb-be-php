@@ -5,7 +5,8 @@ services:
     plan: starter
     dockerContext: .
     dockerCommand: >
-      sh -c "apk update &&
+      sh -c "cd /opt/render/project/src &&
+      apk update &&
       apk add --no-cache php php-cli php-mbstring php-xml php-pgsql unzip curl git &&
       curl -sS https://getcomposer.org/installer | php &&
       mv composer.phar /usr/local/bin/composer &&
