@@ -45,3 +45,12 @@ Route::delete('image-delete', [ImageController::class, 'deleteImage']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Simple health check route
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'environment' => app()->environment(),
+        'time' => now()->toDateTimeString(),
+    ], 200);
+});
