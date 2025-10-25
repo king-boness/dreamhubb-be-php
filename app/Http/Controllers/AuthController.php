@@ -35,12 +35,12 @@ class AuthController extends Controller
         }
         $user = Auth::user();
 
-        if ($user->email_verified_at == null) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Email not verified',
-            ], 401);
-        }
+        // if ($user->email_verified_at == null) {
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'message' => 'Email not verified',
+            //     ], 401);
+            // }
 
         return response()->json([
             'status' => 'success',
