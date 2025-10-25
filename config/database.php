@@ -68,9 +68,8 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            'sslmode' => env('DB_SSLMODE', 'disable'),
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
-                defined('PDO::PGSQL_ATTR_SSL_MODE') ? constant('PDO::PGSQL_ATTR_SSL_MODE') : null => 'prefer',
             ]) : [],
         ],
 
