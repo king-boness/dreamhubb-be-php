@@ -95,7 +95,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        event(new Registered($user));
+        // event(new Registered($user));
 
         return response()->json([
             'status' => 'success',
