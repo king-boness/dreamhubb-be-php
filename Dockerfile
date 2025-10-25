@@ -34,7 +34,7 @@ RUN apk add --no-cache \
     openssl \
     libssl3 \
     libpq \
-    postgresql-client
+    postgresql16-client
 
 # Update certificates
 RUN update-ca-certificates
