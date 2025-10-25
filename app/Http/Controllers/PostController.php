@@ -53,7 +53,7 @@ class PostController extends Controller
         //     'views' => 'required|integer'
         // ]);
 
-        $post_id = Post::insertGetId([
+        $post = Post::create([
             'title' => $request->title,
             'description' => $request->description,
             'user_id' => $user->id,
@@ -61,11 +61,17 @@ class PostController extends Controller
             'date_deadline' => $request->date_deadline,
             'category_id' => $request->category_id,
         ]);
-        foreach ($request->images as $image) {
-            PostImageController::uploadImage($image, $post_id);
+
+        if ($request->has('images')) {
+            foreach ($request->images as $image) {
+                PostImageController::uploadImage($image, $post->post_id);
+            }
         }
+
         return response()->json([
-            'message' => 'Post created successfully'
+            'status' => 'success',
+            'message' => 'Post created successfully',
+            'post_id' => $post->post_id
         ], 200);
     }
 
