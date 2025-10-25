@@ -9,19 +9,12 @@ class Post extends Model
 {
     use HasFactory;
 
-    // 🔹 názov tabuľky
     protected $table = 'posts';
-
-    // 🔹 primárny kľúč
     protected $primaryKey = 'post_id';
-
-    // 🔹 ak primárny kľúč nie je typu incrementing integer (napr. UUID), nastav:
     public $incrementing = true;
-
-    // 🔹 ak nie je typu string
     protected $keyType = 'int';
+    public $timestamps = true;
 
-    // 🔹 povolené polia (ktoré sa môžu hromadne vkladať)
     protected $fillable = [
         'title',
         'description',
@@ -32,7 +25,4 @@ class Post extends Model
         'tokens',
         'views',
     ];
-
-    // 🔹 ak nemáš `created_at` a `updated_at` ako timestamp v DB, môžeš vypnúť timestamps:
-    public $timestamps = true;
 }
