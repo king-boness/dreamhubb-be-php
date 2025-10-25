@@ -39,7 +39,9 @@ RUN apk add --no-cache \
     git \
     unzip \
     ca-certificates \
-    openssl
+    openssl \
+    libssl3 \
+    libpq
 
 RUN update-ca-certificates
 RUN ln -s /usr/bin/php82 /usr/bin/php
