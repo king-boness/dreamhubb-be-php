@@ -1,21 +1,13 @@
-# ==========================
-# 1️⃣ BUILD STAGE (Composer)
-# ==========================
+# Stage 1: Build
 FROM composer:2 AS build
-
 WORKDIR /app
-
-# Skopíruj celý projekt hneď na začiatku
 COPY . .
-
-# Inštalácia závislostí (bez dev)
 RUN composer install --no-dev --optimize-autoloader
 
-# ==========================
-# 2️⃣ RUNTIME STAGE (PHP)
-# ==========================
+# Stage 2: Runtime
 FROM alpine:3.20
 
+# Install PHP, PostgreSQL extensions, and PostgreSQL client
 RUN apk add --no-cache \
     php82 \
     php82-cli \
@@ -44,14 +36,19 @@ RUN apk add --no-cache \
     libpq \
     postgresql-client
 
+# Update certificates
 RUN update-ca-certificates
+
+# Link PHP binary
 RUN ln -s /usr/bin/php82 /usr/bin/php
 
+# Set working directory
 WORKDIR /app
 
-# Skopíruj všetko (vrátane vendor z build stage)
+# Copy the built app
 COPY --from=build /app /app
 
+# Make start script executable
 RUN chmod +x /app/start.sh || true
 
-CMD ["sh", "-c", "php artisan migrate --force || true && php artisan serve --host=0.0.0.0 --port=10000"]
+CMD ["/app/start.sh"]
