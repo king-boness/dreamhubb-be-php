@@ -71,13 +71,9 @@ class AuthController extends Controller
                 'message' => $e->getMessage(),
             ], 406);
         }
-        $profile_image = ImageController::uploadImage($request, true);
-        if (!$profile_image) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $profile_image,
-            ], 400);
-        }
+
+        // 🧩 temporarily skip image upload
+        $profile_image = null;
 
         $user = User::create([
             'profile_picture' => $profile_image,
@@ -98,6 +94,7 @@ class AuthController extends Controller
                 'message' => 'Unauthorized',
             ], 401);
         }
+
         event(new Registered($user));
 
         return response()->json([
