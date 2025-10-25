@@ -41,7 +41,8 @@ RUN apk add --no-cache \
     ca-certificates \
     openssl \
     libssl3 \
-    libpq
+    libpq \
+    postgresql-client
 
 RUN update-ca-certificates
 RUN ln -s /usr/bin/php82 /usr/bin/php
