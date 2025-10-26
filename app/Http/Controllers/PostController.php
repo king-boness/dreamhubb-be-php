@@ -272,4 +272,66 @@ class PostController extends Controller
             ], 500);
         }
     }
+
+    // 🟥 DELETE POST (vrátane obrázkov)
+    public function deletePost($id)
+    {
+        try {
+            $user = auth()->user();
+
+            // 🧩 Ak nie je prihlásený
+            if (!$user) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthenticated: Please log in to delete posts.'
+                ], 401);
+            }
+
+            // 🔍 Nájdeme post
+            $post = DB::table('posts')->where('post_id', $id)->first();
+
+            if (!$post) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Post not found.'
+                ], 404);
+            }
+
+            // ❌ Overíme, či post patrí prihlásenému userovi
+            if ($post->user_id !== $user->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized: You can only delete your own posts.'
+                ], 403);
+            }
+
+            // 🗑️ Najprv vymažeme obrázky
+            $images = DB::table('post_images')->where('post_id', $id)->get();
+            foreach ($images as $img) {
+                if (file_exists(storage_path('app/public/' . $img->image))) {
+                    @unlink(storage_path('app/public/' . $img->image));
+                }
+            }
+            DB::table('post_images')->where('post_id', $id)->delete();
+
+            // 🗑️ Potom samotný post
+            DB::table('posts')->where('post_id', $id)->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Post and related images deleted successfully.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('❌ Post deletion failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
