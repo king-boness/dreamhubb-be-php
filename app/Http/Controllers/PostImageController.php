@@ -2,72 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PostImage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PostImageController extends Controller
 {
-    public function uploadImage($image, $post_id)
+    public function store(Request $request)
     {
         try {
-            // 1️⃣ Nahraj obrázok do storage (napr. /storage/app/public/posts)
-            $path = $image->store('posts', 'public');
+            // ✅ Validácia vstupov
+            $request->validate([
+                'image' => 'required|file|image|max:5120',
+                'post_id' => 'required|integer|exists:posts,post_id',
+            ]);
 
-            // 2️⃣ Ulož záznam do databázy
-            $postImage = PostImage::create([
-                'post_id' => $post_id,
+            // ✅ Uloženie súboru do storage/app/public/post_images
+            $path = $request->file('image')->store('post_images', 'public');
+
+            // ✅ Uloženie záznamu do DB
+            $postImageId = DB::table('post_images')->insertGetId([
+                'post_id' => $request->post_id,
                 'image' => $path,
                 'public_id' => basename($path),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
-            Log::info('📸 Created PostImage', [
-                'exists' => $postImage->exists,
-                'data' => $postImage
-            ]);
-
-            // 3️⃣ Zaloguj výsledok (pomôže pri debugovaní)
-            Log::info('✅ Image uploaded successfully', [
-                'post_id' => $post_id,
+            // ✅ Log (len na debug)
+            Log::info('🧩 Image uploaded', [
+                'post_image_id' => $postImageId,
                 'path' => $path,
-                'public_id' => basename($path),
             ]);
 
-            // 4️⃣ Vráť odpoveď pre FE/Postman
+            // ✅ Odpoveď
             return response()->json([
+                'status' => 'success',
                 'message' => 'Image uploaded successfully',
-                'post_id' => $post_id,
-                'image' => $path,
-                'public_id' => basename($path),
+                'path' => $path,
             ], 200);
 
         } catch (\Exception $e) {
-            // 5️⃣ Ak niečo zlyhá, zapíš chybu do logu
-            Log::error('❌ Image upload failed', ['error' => $e->getMessage()]);
+            Log::error('❌ Image upload failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
             return response()->json([
-                'message' => 'Image upload failed',
-                'error' => $e->getMessage()
+                'status' => 'error',
+                'message' => $e->getMessage(),
             ], 500);
         }
-    }
-
-    public static function destroyPostImage($public_id)
-    {
-        $postImage = PostImage::where('public_id', $public_id)->first();
-
-        if ($postImage) {
-            Storage::disk('public')->delete($postImage->image);
-            $postImage->delete();
-
-            return response()->json([
-                'message' => 'Image deleted successfully'
-            ], 200);
-        }
-
-        return response()->json([
-            'message' => 'Image not found'
-        ], 404);
     }
 }
