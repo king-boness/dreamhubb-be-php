@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class PostImageController extends Controller
 {
-    public static function uploadImage($image, $post_id)
+    public function uploadImage($image, $post_id)
     {
         try {
             // 1️⃣ Nahraj obrázok do storage (napr. /storage/app/public/posts)
@@ -20,6 +20,11 @@ class PostImageController extends Controller
                 'post_id' => $post_id,
                 'image' => $path,
                 'public_id' => basename($path),
+            ]);
+
+            Log::info('📸 Created PostImage', [
+                'exists' => $postImage->exists,
+                'data' => $postImage
             ]);
 
             // 3️⃣ Zaloguj výsledok (pomôže pri debugovaní)

@@ -64,7 +64,7 @@ class PostController extends Controller
 
         if ($request->has('images')) {
             foreach ($request->images as $image) {
-                PostImageController::uploadImage($image, $post->post_id);
+                app(PostImageController::class)->uploadImage($image, $post_id);
             }
         }
 
