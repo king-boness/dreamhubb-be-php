@@ -133,4 +133,66 @@ class PostController extends Controller
             ], 500);
         }
     }
+
+    // 🟨 GET SINGLE POST (detail)
+    public function getPost($id)
+    {
+        try {
+            // 🔍 Získaj post podľa ID
+            $post = DB::table('posts')
+                ->join('users', 'posts.user_id', '=', 'users.id')
+                ->join('categories', 'posts.category_id', '=', 'categories.category_id')
+                ->leftJoin('post_images', 'posts.post_id', '=', 'post_images.post_id')
+                ->select(
+                    'posts.post_id',
+                    'posts.title',
+                    'posts.description',
+                    'posts.date_created',
+                    'posts.date_deadline',
+                    'posts.tokens',
+                    'posts.views',
+                    'categories.name as category_name',
+                    'users.username as author_name',
+                    DB::raw('array_agg(post_images.image) as images')
+                )
+                ->where('posts.post_id', '=', $id)
+                ->groupBy(
+                    'posts.post_id',
+                    'posts.title',
+                    'posts.description',
+                    'posts.date_created',
+                    'posts.date_deadline',
+                    'posts.tokens',
+                    'posts.views',
+                    'categories.name',
+                    'users.username'
+                )
+                ->first();
+
+            // ❌ Ak post neexistuje
+            if (!$post) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Post not found',
+                ], 404);
+            }
+
+            // ✅ Úspešná odpoveď
+            return response()->json([
+                'status' => 'success',
+                'post' => $post,
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('❌ Fetch single post failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
