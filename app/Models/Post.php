@@ -25,4 +25,8 @@ class Post extends Model
         'tokens',
         'views',
     ];
+
+public function postImages()
+{
+    return $this->hasMany(PostImage::class, 'post_id', 'post_id');
 }

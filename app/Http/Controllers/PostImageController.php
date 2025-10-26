@@ -3,34 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Models\PostImage;
-use App\Models\User;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Storage;
 
 class PostImageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public static function uploadImage($imageFile, $post_id)
+    public static function uploadImage($image, $post_id)
     {
-        $uploadFolder = 'users/' . Auth::user()->email . '/post_images';
-        $imageName = $imageFile->getClientOriginalName();
-        $result = $imageFile->storeOnCloudinaryAs($uploadFolder, $imageName);
-        PostImage::create([
+        // Nahraj obrázok do storage (napr. /storage/app/public/posts)
+        $path = $image->store('posts', 'public');
+
+        // Ulož záznam do databázy
+        $postImage = PostImage::create([
             'post_id' => $post_id,
-            'image' => $result->getSecurePath(),
-            'public_id' => $result->getPublicId(),
+            'image' => $path, // názov stĺpca v DB
+            'public_id' => basename($path),
         ]);
+
+        return $postImage;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public static function destroyPostImage($public_id)
     {
-        Cloudinary::destroy($public_id);
+        $postImage = PostImage::where('public_id', $public_id)->first();
+
+        if ($postImage) {
+            Storage::disk('public')->delete($postImage->image);
+            $postImage->delete();
+        }
+
+        return response()->json([
+            'message' => 'Image deleted successfully'
+        ]);
     }
 }
