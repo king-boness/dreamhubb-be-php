@@ -1,108 +1,68 @@
-<?php
-
-namespace App\Http\Controllers;
-
-use App\Models\Post;
-use App\Models\PostImage;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Date;
-
-class PostController extends Controller
+public function createPost(Request $request)
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
-
-    public function getPosts()
-    {
-        $posts = Post::with('postImages', 'category', 'user.userBadge')->get();
-        return response()->json([
-            'posts' => $posts
-        ], 200);
-    }
-
-    public function getPost($id)
-    {
-        $post = Post::find($id);
-        return response()->json([
-            'post' => $post
-        ], 200);
-    }
-
-    public function getMyPosts()
-    {
-        $user = Auth::user();
-        $posts = Post::where('user_id', $user->id)->get();
-        return response()->json([
-            'posts' => $posts
-        ], 200);
-    }
-
-    public function createPost(Request $request)
-    {
+    try {
         $user = auth()->user();
-        // $validated = $request->validate([
-        //     'title' => 'required|string',
-        //     'description' => 'required|string',
-        //     'date_created' => 'required|string',
-        //     'date_deadline' => 'required|string',
-        //     'category_id' => 'required|integer',
-        //     'tokens' => 'required|integer',
-        //     'views' => 'required|integer'
-        // ]);
 
-        $post = Post::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'user_id' => $user->id,
-            'date_created' => date('Y-m-d'),
-            'date_deadline' => $request->date_deadline,
-            'category_id' => $request->category_id,
+        // ✅ Validácia vstupov
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'date_deadline' => 'nullable|date',
+            'category_id' => 'required|integer|exists:categories,category_id',
+            'images.*' => 'nullable|file|image|max:5120' // max 5 MB na obrázok
         ]);
 
-        if ($request->has('images')) {
-            foreach ($request->images as $image) {
-                app(PostImageController::class)->uploadImage($image, $post_id);
+        // ✅ Vytvorenie postu
+        $postId = DB::table('posts')->insertGetId([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'user_id' => $user->id,
+            'date_created' => now()->toDateString(),
+            'date_deadline' => $validated['date_deadline'] ?? null,
+            'category_id' => $validated['category_id'],
+            'tokens' => 0,
+            'views' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $uploadedImages = [];
+
+        // ✅ Ak request obsahuje obrázky
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('post_images', 'public');
+                $publicId = basename($path);
+
+                DB::table('post_images')->insert([
+                    'post_id' => $postId,
+                    'image' => $path,
+                    'public_id' => $publicId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $uploadedImages[] = $path;
             }
         }
 
+        // ✅ Úspešná odpoveď
         return response()->json([
             'status' => 'success',
             'message' => 'Post created successfully',
-            'post_id' => $post->post_id
+            'post_id' => $postId,
+            'uploaded_images' => $uploadedImages
         ], 200);
-    }
 
-    public function updatePost(Request $request, $id)
-    {
-        $post = Post::find($id);
-        $post->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'date_created' => $request->date_created,
-            'date_deadline' => $request->date_deadline,
-            'category_id' => $request->category_id,
-            'tokens' => $request->tokens,
-            'views' => $request->views
+    } catch (\Exception $e) {
+        Log::error('❌ Post creation failed', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
         ]);
-        return response()->json([
-            'post' => $post
-        ], 200);
-    }
 
-    public function deletePost($id)
-    {
-        $post = Post::find($id);
-        $postImages = PostImage::where('post_id', $id)->get();
-        foreach ($postImages as $postImage) {
-            PostImageController::destroyPostImage($postImage->public_id);
-            $postImage->delete();
-        }
-        $post->delete();
         return response()->json([
-            'message' => 'Post deleted successfully'
-        ], 200);
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
     }
 }
