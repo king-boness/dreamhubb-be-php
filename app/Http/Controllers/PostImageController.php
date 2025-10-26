@@ -5,22 +5,47 @@ namespace App\Http\Controllers;
 use App\Models\PostImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class PostImageController extends Controller
 {
     public static function uploadImage($image, $post_id)
     {
-        // Nahraj obrázok do storage (napr. /storage/app/public/posts)
-        $path = $image->store('posts', 'public');
+        try {
+            // 1️⃣ Nahraj obrázok do storage (napr. /storage/app/public/posts)
+            $path = $image->store('posts', 'public');
 
-        // Ulož záznam do databázy
-        $postImage = PostImage::create([
-            'post_id' => $post_id,
-            'image' => $path, // názov stĺpca v DB
-            'public_id' => basename($path),
-        ]);
+            // 2️⃣ Ulož záznam do databázy
+            $postImage = PostImage::create([
+                'post_id' => $post_id,
+                'image' => $path,
+                'public_id' => basename($path),
+            ]);
 
-        return $postImage;
+            // 3️⃣ Zaloguj výsledok (pomôže pri debugovaní)
+            Log::info('✅ Image uploaded successfully', [
+                'post_id' => $post_id,
+                'path' => $path,
+                'public_id' => basename($path),
+            ]);
+
+            // 4️⃣ Vráť odpoveď pre FE/Postman
+            return response()->json([
+                'message' => 'Image uploaded successfully',
+                'post_id' => $post_id,
+                'image' => $path,
+                'public_id' => basename($path),
+            ], 200);
+
+        } catch (\Exception $e) {
+            // 5️⃣ Ak niečo zlyhá, zapíš chybu do logu
+            Log::error('❌ Image upload failed', ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'message' => 'Image upload failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public static function destroyPostImage($public_id)
@@ -30,10 +55,14 @@ class PostImageController extends Controller
         if ($postImage) {
             Storage::disk('public')->delete($postImage->image);
             $postImage->delete();
+
+            return response()->json([
+                'message' => 'Image deleted successfully'
+            ], 200);
         }
 
         return response()->json([
-            'message' => 'Image deleted successfully'
-        ]);
+            'message' => 'Image not found'
+        ], 404);
     }
 }
