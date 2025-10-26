@@ -13,15 +13,17 @@ class PostController extends Controller
         try {
             $user = auth()->user();
 
+            // ✅ Validácia vstupov
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
                 'date_deadline' => 'nullable|date',
                 'category_id' => 'required|integer|exists:categories,category_id',
-                'images.*' => 'nullable|file|image|max:5120'
+                'images.*' => 'nullable|file|image|max:5120', // max 5 MB
             ]);
 
-            $postId = DB::table('posts')->insertGetId([
+            // ✅ Vloženie postu
+            DB::table('posts')->insert([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'user_id' => $user->id,
@@ -34,8 +36,12 @@ class PostController extends Controller
                 'updated_at' => now(),
             ]);
 
+            // ✅ Získanie ID posledného vloženého postu
+            $postId = DB::getPdo()->lastInsertId();
+
             $uploadedImages = [];
 
+            // ✅ Ak request obsahuje obrázky
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
                     $path = $image->store('post_images', 'public');
@@ -53,11 +59,12 @@ class PostController extends Controller
                 }
             }
 
+            // ✅ Úspešná odpoveď
             return response()->json([
                 'status' => 'success',
                 'message' => 'Post created successfully',
                 'post_id' => $postId,
-                'uploaded_images' => $uploadedImages
+                'uploaded_images' => $uploadedImages,
             ], 200);
 
         } catch (\Exception $e) {
