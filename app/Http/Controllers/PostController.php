@@ -195,4 +195,81 @@ class PostController extends Controller
             ], 500);
         }
     }
+
+    // 🟧 UPDATE POST (editácia)
+    public function updatePost(Request $request, $id)
+    {
+        try {
+            $user = auth()->user();
+
+            // 🧩 Skontroluj, či post patrí tomuto userovi
+            $post = DB::table('posts')->where('post_id', $id)->first();
+            if (!$post) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Post not found.',
+                ], 404);
+            }
+            if ($post->user_id !== $user->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized: You can only edit your own posts.',
+                ], 403);
+            }
+
+            // ✅ Validácia vstupov
+            $validated = $request->validate([
+                'title' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
+                'date_deadline' => 'nullable|date',
+                'category_id' => 'nullable|integer|exists:categories,category_id',
+                'images.*' => 'nullable|file|image|max:5120',
+            ]);
+
+            // ✅ Aktualizácia postu
+            DB::table('posts')
+                ->where('post_id', $id)
+                ->update([
+                    'title' => $validated['title'] ?? $post->title,
+                    'description' => $validated['description'] ?? $post->description,
+                    'date_deadline' => $validated['date_deadline'] ?? $post->date_deadline,
+                    'category_id' => $validated['category_id'] ?? $post->category_id,
+                    'updated_at' => now(),
+                ]);
+
+            // ✅ Ak sú nové obrázky → zmaž staré a pridaj nové
+            if ($request->hasFile('images')) {
+                DB::table('post_images')->where('post_id', $id)->delete();
+
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('post_images', 'public');
+                    $publicId = basename($path);
+
+                    DB::table('post_images')->insert([
+                        'post_id' => $id,
+                        'image' => $path,
+                        'public_id' => $publicId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Post updated successfully.',
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('❌ Post update failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
