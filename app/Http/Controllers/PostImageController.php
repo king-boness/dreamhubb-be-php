@@ -13,7 +13,7 @@ class PostImageController extends Controller
         try {
             // ✅ Validácia vstupov
             $request->validate([
-                'image' => 'required|file|image|max:5120',
+                'image' => 'required|file|image|max:5120', // max 5 MB
                 'post_id' => 'required|integer|exists:posts,post_id',
             ]);
 
@@ -27,10 +27,10 @@ class PostImageController extends Controller
                 'public_id' => basename($path),
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ], 'post_image_id'); // 👈 PostgreSQL potrebuje explicitne názov primárneho kľúča
 
-            // ✅ Log (len na debug)
-            Log::info('🧩 Image uploaded', [
+            // ✅ Log (na debug)
+            Log::info('🧩 Image uploaded successfully', [
                 'post_image_id' => $postImageId,
                 'path' => $path,
             ]);
@@ -40,9 +40,11 @@ class PostImageController extends Controller
                 'status' => 'success',
                 'message' => 'Image uploaded successfully',
                 'path' => $path,
+                'post_image_id' => $postImageId,
             ], 200);
 
         } catch (\Exception $e) {
+            // ❌ Log chyby
             Log::error('❌ Image upload failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
