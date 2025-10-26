@@ -98,7 +98,7 @@ class PostController extends Controller
                     'posts.tokens',
                     'posts.views',
                     'categories.name as category_name',
-                    'users.name as author_name',
+                    'users.username as author_name',
                     DB::raw('array_agg(post_images.image) as images')
                 )
                 ->groupBy(
@@ -110,7 +110,7 @@ class PostController extends Controller
                     'posts.tokens',
                     'posts.views',
                     'categories.name',
-                    'users.name'
+                    'users.username'
                 )
                 ->orderBy('posts.created_at', 'desc')
                 ->get();
