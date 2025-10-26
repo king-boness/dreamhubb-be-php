@@ -3,9 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ImageController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\VerifyEmailController;
+use App\Http\Controllers\PostImageController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -13,24 +12,20 @@ use Illuminate\Support\Facades\Auth;
 | API Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| Všetky API routy pre Dreamhubb BE.
+| Načítava ich RouteServiceProvider a sú priradené k "api" middleware.
 |
 */
 
-// // Resend link to verify email
-// Route::post('/email/verify/resend', function (Request $request) {
-//     $request->user()->sendEmailVerificationNotification();
-//     return back()->with('message', 'Verification link sent!');
-// })->middleware(['auth:api', 'throttle:6,1'])->name('verification.send');
-
+// ========== AUTH ROUTES ==========
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
     Route::post('register', 'register');
     Route::post('logout', 'logout');
     Route::post('refresh', 'refresh');
 });
+
+// ========== POSTS ROUTES ==========
 Route::controller(PostController::class)->group(function () {
     Route::get('posts', 'getPosts');
     Route::get('posts/{id}', 'getPost');
@@ -39,14 +34,17 @@ Route::controller(PostController::class)->group(function () {
     Route::put('post-update/{id}', 'updatePost');
     Route::delete('post-delete/{id}', 'deletePost');
 });
-Route::post('image-upload', [ImageController::class, 'uploadImage']);
-Route::delete('image-delete', [ImageController::class, 'deleteImage']);
 
+// ========== POST IMAGES UPLOAD ==========
+Route::post('/image-upload', [PostImageController::class, 'store'])
+    ->middleware('auth:api'); // obrázky len pre prihlásených
+
+// ========== USER ROUTE ==========
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Simple health check route
+// ========== HEALTH CHECK ==========
 Route::get('/health', function () {
     return response()->json([
         'status' => 'ok',
