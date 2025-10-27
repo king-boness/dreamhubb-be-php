@@ -15,8 +15,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        // login + register nevyžadujú token
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'verifyEmail']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'refresh', 'verifyEmail', 'resendVerificationEmail']]);
     }
 
     /**
