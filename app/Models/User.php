@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+/**
+ * @method bool hasVerifiedEmail()
+ * @method void sendEmailVerificationNotification()
+ */
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
