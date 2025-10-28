@@ -5,46 +5,51 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\UploadController;
 
 class PostImageController extends Controller
 {
     public function store(Request $request)
     {
         try {
-            // ✅ Validácia vstupov
             $request->validate([
-                'image' => 'required|file|image|max:5120', // max 5 MB
+                'file' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
                 'post_id' => 'required|integer|exists:posts,post_id',
             ]);
 
-            // ✅ Uloženie súboru do storage/app/public/post_images
-            $path = $request->file('image')->store('post_images', 'public');
+            // 🔹 Zavoláme centrálny UploadController
+            $uploadController = new UploadController();
+            $uploadResponse = $uploadController->upload($request);
+            $uploadData = $uploadResponse->getData();
 
-            // ✅ Uloženie záznamu do DB
+            if ($uploadData->status !== 'success') {
+                return $uploadResponse;
+            }
+
+            // 🔹 Uloženie záznamu do DB
             $postImageId = DB::table('post_images')->insertGetId([
                 'post_id' => $request->post_id,
-                'image' => $path,
-                'public_id' => basename($path),
+                'image' => $uploadData->url,
+                'public_id' => $uploadData->public_id ?? null,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ], 'post_image_id'); // 👈 PostgreSQL potrebuje explicitne názov primárneho kľúča
+            ], 'post_image_id');
 
-            // ✅ Log (na debug)
             Log::info('🧩 Image uploaded successfully', [
                 'post_image_id' => $postImageId,
-                'path' => $path,
+                'url' => $uploadData->url,
             ]);
 
-            // ✅ Odpoveď
             return response()->json([
                 'status' => 'success',
-                'message' => 'Image uploaded successfully',
-                'path' => $path,
-                'post_image_id' => $postImageId,
-            ], 200);
-
+                'message' => 'Image uploaded successfully.',
+                'image' => [
+                    'id' => $postImageId,
+                    'url' => $uploadData->url,
+                    'public_id' => $uploadData->public_id ?? null,
+                ]
+            ]);
         } catch (\Exception $e) {
-            // ❌ Log chyby
             Log::error('❌ Image upload failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

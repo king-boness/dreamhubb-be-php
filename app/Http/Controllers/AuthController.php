@@ -30,7 +30,7 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        $token = Auth::attempt($credentials);
+        $token = auth('api')->attempt($credentials);
         if (!$token) {
             return response()->json([
                 'status' => 'error',
@@ -38,11 +38,10 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = Auth::user();
+        $user = auth('api')->user();
 
-        // 🔒 Zablokuj prihlásenie, ak email nie je overený
         if (!$user->hasVerifiedEmail()) {
-            Auth::logout();
+            auth('api')->logout();
             return response()->json([
                 'status' => 'error',
                 'message' => 'Please verify your email before logging in.',
@@ -111,7 +110,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        Auth::logout();
+        auth('api')->logout();
 
         return response()->json([
             'status' => 'success',
@@ -125,35 +124,40 @@ class AuthController extends Controller
     public function refresh()
     {
         try {
-            $newToken = Auth::refresh();
+            // ✅ Získaj nový token zo starého
+            $newToken = auth('api')->refresh();
 
             return response()->json([
                 'status' => 'success',
                 'authorization' => [
                     'token' => $newToken,
                     'type' => 'bearer',
-                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                    'expires_in' => auth('api')->factory()->getTTL() * 60,
                 ],
-            ]);
-        } catch (Exception $e) {
+            ], 200);
+
+        } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Token refresh failed',
+                'message' => 'Token has expired and cannot be refreshed.',
             ], 401);
+        } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid token.',
+            ], 401);
+        } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token not provided or refresh failed.',
+            ], 401);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unexpected error during refresh.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-    }
-
-    /**
-     * 🟢 Potvrdenie overenia emailu (kliknutím na link)
-     */
-    public function verifyEmail(EmailVerificationRequest $request)
-    {
-        $request->fulfill();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Email verified successfully!',
-        ]);
     }
 
     /**
