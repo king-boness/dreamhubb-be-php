@@ -1,0 +1,953 @@
+{
+	"info": {
+		"_postman_id": "77a1f59a-629d-4076-9505-7bfab33b9fd8",
+		"name": "Dreamhubb API",
+		"description": "Laravel BE / Localhost / Dreamhubb – Auth + User Profile systém",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27807033"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"mato\",\r\n    \"email\": \"mato@example.com\",\r\n    \"password\": \"secret123\",\r\n    \"password_confirmation\": \"secret123\",\r\n    \"date_birth\": \"1996-08-21\",\r\n    \"gender\": \"male\",\r\n    \"location_country_id\": 1,\r\n    \"location_continent_id\": 1,\r\n    \"location_city_id\": 2\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/register",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Automatické uloženie JWT tokenu po úspešnom logine\r",
+									"if (pm.response.code === 200) {\r",
+									"    try {\r",
+									"        const jsonData = pm.response.json();\r",
+									"        if (jsonData.authorization && jsonData.authorization.token) {\r",
+									"            pm.environment.set(\"JWT\", jsonData.authorization.token);\r",
+									"            console.log(\"✅ JWT token uložený:\", jsonData.authorization.token);\r",
+									"        } else {\r",
+									"            console.log(\"⚠️ Token sa nenašiel v odpovedi.\");\r",
+									"        }\r",
+									"    } catch (e) {\r",
+									"        console.log(\"❌ Chyba pri parsovaní odpovede:\", e);\r",
+									"    }\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"mato@example.com\",\r\n  \"password\": \"secret123\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjAxOTYxLCJleHAiOjE3NjE2MDU1NjEsIm5iZiI6MTc2MTYwMTk2MSwianRpIjoiMWJuTzdwQXg3dFFscmkyTCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvIn0.1tiEcaGFOfvB6TvLKwKuUT0eVkQB-cnAa4ewWEpwnug",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/refresh",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjAxOTYxLCJleHAiOjE3NjE2MDU1NjEsIm5iZiI6MTc2MTYwMTk2MSwianRpIjoiMWJuTzdwQXg3dFFscmkyTCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvIn0.1tiEcaGFOfvB6TvLKwKuUT0eVkQB-cnAa4ewWEpwnug",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/logout",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjAxOTYxLCJleHAiOjE3NjE2MDU1NjEsIm5iZiI6MTc2MTYwMTk2MSwianRpIjoiMWJuTzdwQXg3dFFscmkyTCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvIn0.1tiEcaGFOfvB6TvLKwKuUT0eVkQB-cnAa4ewWEpwnug",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjAxOTYxLCJleHAiOjE3NjE2MDU1NjEsIm5iZiI6MTc2MTYwMTk2MSwianRpIjoiMWJuTzdwQXg3dFFscmkyTCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvIn0.1tiEcaGFOfvB6TvLKwKuUT0eVkQB-cnAa4ewWEpwnug",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"mato_updated\",\r\n  \"gender\": \"male\",\r\n  \"location_city_id\": 2\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user/update",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Picture",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjAxOTYxLCJleHAiOjE3NjE2MDU1NjEsIm5iZiI6MTc2MTYwMTk2MSwianRpIjoiMWJuTzdwQXg3dFFscmkyTCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvIn0.1tiEcaGFOfvB6TvLKwKuUT0eVkQB-cnAa4ewWEpwnug",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "profile_picture",
+									"type": "file",
+									"src": "/C:/Users/matej/OneDrive/Počítač/dreamhubb/design/logotvorba/Profile.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user/profile-picture",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"profile-picture"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjAxOTYxLCJleHAiOjE3NjE2MDU1NjEsIm5iZiI6MTc2MTYwMTk2MSwianRpIjoiMWJuTzdwQXg3dFFscmkyTCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvIn0.1tiEcaGFOfvB6TvLKwKuUT0eVkQB-cnAa4ewWEpwnug",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"current_password\": \"heslo123\",\r\n  \"new_password\": \"heslo456\",\r\n  \"new_password_confirmation\": \"heslo456\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user/change-password",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/user/profile-picture – Upload or Update profile image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjAxOTYxLCJleHAiOjE3NjE2MDU1NjEsIm5iZiI6MTc2MTYwMTk2MSwianRpIjoiMWJuTzdwQXg3dFFscmkyTCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvIn0.1tiEcaGFOfvB6TvLKwKuUT0eVkQB-cnAa4ewWEpwnug",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"description": "Obrázok, ktorý sa má nahrať (max. 5 MB, formáty jpeg/png/jpg/webp/gif)",
+									"type": "file",
+									"src": "/C:/Users/matej/OneDrive/Počítač/dreamhubb/design/logotvorba/Profile.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/user/profile-picture",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"profile-picture"
+							]
+						},
+						"description": "Nahrá alebo aktualizuje profilovú fotku aktuálne prihláseného používateľa.\n\nAutomaticky používa **Cloudinary** (ak `UPLOAD_DRIVER=cloudinary`) alebo **lokálny storage** (ak `UPLOAD_DRIVER=local`).\n\nPri opakovanom nahratí zmaže starý obrázok (ak existuje)."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /api/user/profile-picture – Delete profile image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjA2NTg4LCJleHAiOjE3NjE2MTAxODgsIm5iZiI6MTc2MTYwNjU4OCwianRpIjoiWkx3cWE0bnlyb0NuQktVQiIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvX3VwZGF0ZWQifQ.cN9QqK_9yeR0TtSa3YCqyVMoeRXFAju07LG02dOFxd8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/user/profile-picture",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"profile-picture"
+							]
+						},
+						"description": "Odstráni profilový obrázok používateľa z Cloudinary (alebo lokálneho storage) a vynuluje jeho údaje v databáze."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Upload / Files",
+			"item": [
+				{
+					"name": "POST /api/upload – Global file upload (Cloudinary / Local)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjAxOTYxLCJleHAiOjE3NjE2MDU1NjEsIm5iZiI6MTc2MTYwMTk2MSwianRpIjoiMWJuTzdwQXg3dFFscmkyTCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvIn0.1tiEcaGFOfvB6TvLKwKuUT0eVkQB-cnAa4ewWEpwnug",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/matej/OneDrive/Počítač/dreamhubb/design/logotvorba/Profile.jpg"
+								},
+								{
+									"key": "folder",
+									"value": "profile_pictures",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/upload",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"upload"
+							]
+						},
+						"description": "Globálny endpoint pre upload súborov.\n\nPoužíva Cloudinary (ak `UPLOAD_DRIVER=cloudinary`) alebo lokálny storage (ak `UPLOAD_DRIVER=local`).\n\nPoužíva sa pre upload profilových obrázkov, obrázkov príspevkov a iných assetov."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "1.1.6 / Token expiration handling (middleware)",
+			"item": [
+				{
+					"name": "POST /api/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();\r",
+									"if (res.authorization && res.authorization.token) {\r",
+									"    pm.environment.set(\"token\", res.authorization.token);\r",
+									"} else if (res.token) {\r",
+									"    pm.environment.set(\"token\", res.token);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"husky24@example.com\",\r\n  \"password\": \"heslo123\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/user",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": "token z login requestu",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"husky24@example.com\",\r\n  \"password\": \"heslo123\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjU5ODUzLCJleHAiOjE3NjE3NDYyNTMsIm5iZiI6MTc2MTY1OTg1MywianRpIjoid2pxaFpXYWNIbENaNmdHZCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvX3VwZGF0ZWQifQ.jaeo2zfHSrc6u7rIdjaz4IzA96HuUN-vChHR5rC3NnA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjU4NDMwLCJleHAiOjE3NjE3NDQ4MzAsIm5iZiI6MTc2MTY1ODQzMCwianRpIjoiaFZaclVRdFZEbTFHbEtnQSIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvX3VwZGF0ZWQifQ.K1zRo8GhvImjNPO_4B2ZWfI_8x1ytTKAM9JMhvFmSt4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/refresh",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL3JlZnJlc2giLCJpYXQiOjE3NjE2NTgzNDksImV4cCI6MTc2MTc0NDc4MSwibmJmIjoxNzYxNjU4MzgxLCJqdGkiOiJoUDI3Q05KeVEyVk1SS3dMIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJ1c2VybmFtZSI6Im1hdG9fdXBkYXRlZCJ9.8MI4RTNpiz11-xbISpG-2MGV8Rq3Tg2wmat9E1NxkEU",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/logout",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL3JlZnJlc2giLCJpYXQiOjE3NjE2NTg0MzAsImV4cCI6MTc2MTc0NDg2OCwibmJmIjoxNzYxNjU4NDY4LCJqdGkiOiI1bXpZN3N2NnF2ZDBTbXhQIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJ1c2VybmFtZSI6Im1hdG9fdXBkYXRlZCJ9.o6a5FLekaGNdo7AwMg_VB9AKwpjUNXh37ryLqGPD4YM",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/matej/OneDrive/Počítač/dreamhubb/design/logotvorba/Profile.jpg"
+								},
+								{
+									"key": "folder",
+									"value": "test_uploads",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/upload",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "profile-picture",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL3JlZnJlc2giLCJpYXQiOjE3NjE2NTg0MzAsImV4cCI6MTc2MTc0NDg2OCwibmJmIjoxNzYxNjU4NDY4LCJqdGkiOiI1bXpZN3N2NnF2ZDBTbXhQIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJ1c2VybmFtZSI6Im1hdG9fdXBkYXRlZCJ9.o6a5FLekaGNdo7AwMg_VB9AKwpjUNXh37ryLqGPD4YM",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/matej/OneDrive/Počítač/dreamhubb/design/logotvorba/Profile.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user/profile-picture",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"profile-picture"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "image-upload",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjU5ODUzLCJleHAiOjE3NjE3NDYyNTMsIm5iZiI6MTc2MTY1OTg1MywianRpIjoid2pxaFpXYWNIbENaNmdHZCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvX3VwZGF0ZWQifQ.jaeo2zfHSrc6u7rIdjaz4IzA96HuUN-vChHR5rC3NnA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/matej/OneDrive/Počítač/dreamhubb/design/logotvorba/Screenshot (133).png"
+								},
+								{
+									"key": "post_id",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/image-upload",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"image-upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "posts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjU5ODUzLCJleHAiOjE3NjE3NDYyNTMsIm5iZiI6MTc2MTY1OTg1MywianRpIjoid2pxaFpXYWNIbENaNmdHZCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvX3VwZGF0ZWQifQ.jaeo2zfHSrc6u7rIdjaz4IzA96HuUN-vChHR5rC3NnA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/posts",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post-create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzYxNjU5ODUzLCJleHAiOjE3NjE3NDYyNTMsIm5iZiI6MTc2MTY1OTg1MywianRpIjoid2pxaFpXYWNIbENaNmdHZCIsInN1YiI6IjYiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwidXNlcm5hbWUiOiJtYXRvX3VwZGF0ZWQifQ.jaeo2zfHSrc6u7rIdjaz4IzA96HuUN-vChHR5rC3NnA",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Test upload\",\r\n  \"description\": \"Toto je testovací post pre image upload\",\r\n  \"category_id\": 2\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/post-create",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"post-create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"// 🧩 Global Dreamhubb API hook – ukladá JWT token z ľubovoľnej odpovede\r",
+					"if (pm.response.code === 200) {\r",
+					"    try {\r",
+					"        const res = pm.response.json();\r",
+					"\r",
+					"        // ak má odpoveď štruktúru ako login/refresh\r",
+					"        if (res.authorization && res.authorization.token) {\r",
+					"            const token = res.authorization.token;\r",
+					"            pm.environment.set(\"JWT\", token);\r",
+					"            console.log(\"✅ Token uložený:\", token);\r",
+					"        }\r",
+					"\r",
+					"        // fallback – ak niektoré endpointy vracajú token priamo (napr. register)\r",
+					"        if (res.token && typeof res.token === \"string\") {\r",
+					"            pm.environment.set(\"JWT\", res.token);\r",
+					"            console.log(\"✅ Token uložený (fallback):\", res.token);\r",
+					"        }\r",
+					"    } catch (err) {\r",
+					"        console.log(\"⚠️ Nepodarilo sa spracovať odpoveď:\", err);\r",
+					"    }\r",
+					"}\r",
+					""
+				]
+			}
+		}
+	]
+}
