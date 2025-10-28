@@ -1,21 +1,37 @@
 # 🧩 dreamhubb API – Dokumentácia (v1)
 
+**Verzia:** 1.1.8  
+**Dátum:** 2025-10-28
+
 **Base URL (DEV):** `http://127.0.0.1:8000`  
 **Prefix:** `/api`  
 **Autentifikácia:** `Authorization: Bearer <JWT>`
 
 ---
 
+## 📚 Obsah
+
+- [1. AUTH](#1-auth--registrácia-prihlásenie-verifikácia)
+- [2. USER](#2-user--profil-zmena-hesla-profilovka)
+- [3. UPLOAD](#3-upload--obrázky-príspevkov)
+- [4. POSTS](#4-posts--crud-systém)
+- [5. SYSTEM](#5-system--zdravie-servera)
+- [6. STAVOVÉ KÓDY](#6-stavové-kódy-a-chyby)
+- [AUTENTIFIKÁCIA](#autentifikácia)
+- [POZNÁMKY PRE-FE](#poznámky-pre-fe-tím)
+
+---
+
 ## 🔐 1. AUTH – Registrácia, prihlásenie, verifikácia
 
-| Endpoint                                  | Metóda | Popis                                     | Auth |
-|-------------------------------------------|--------|-------------------------------------------|------|
-| `/api/register`                           |  POST  | Registrácia používateľa                    | ❌ |
-| `/api/login`                              |  POST  | Prihlásenie používateľa (vracia JWT token) | ❌ |
-| `/api/refresh`                            |  POST  | Obnovenie JWT tokenu                       | ❌ |
-| `/api/logout`                             |  POST  | Odhlásenie používateľa                     | ✅ |
-| `/api/verify-email/{id}/{hash}`           |  GET   | Overenie e-mailu po registrácii            | ✅ |
-| `/api/email/verification-notification`    |  POST  | Znova odoslanie verifikačného e-mailu      | ✅ |
+| Endpoint                                  | Metóda | Popis                                      | Auth |
+|-------------------------------------------|--------|--------------------------------------------|------|
+| `/api/register`                           |  POST  | Registrácia používateľa                    |  NO  |
+| `/api/login`                              |  POST  | Prihlásenie používateľa (vracia JWT token) |  NO  |
+| `/api/refresh`                            |  POST  | Obnovenie JWT tokenu                       |  NO  |
+| `/api/logout`                             |  POST  | Odhlásenie používateľa                     |  YES |
+| `/api/verify-email/{id}/{hash}`           |  GET   | Overenie e-mailu po registrácii            |  YES |
+| `/api/email/verification-notification`    |  POST  | Znova odoslanie verifikačného e-mailu      |  YES |
 
 **Request – login:**
 ```json
@@ -36,13 +52,13 @@
 
 ## 👤 2. USER – Profil, zmena hesla, profilovka
 
-| Endpoint               | Metóda |  Popis                                                                        | Auth |
-|------------------------|--------|-------------------------------------------------------------------------------|------|
-/api/user	                GET      Získa detaily prihláseného používateľa	                                         ✅
-/api/user/update	        PUT	     Aktualizácia profilu (username, dátum narodenia, pohlavie, lokácia, atď.)	     ✅
-/api/user/change-password	POST	 Zmena hesla používateľa	                                                     ✅
-/api/user/profile-picture	POST     Upload profilovej fotky (file)	                                                 ✅
-/api/user/profile-picture	DELETE   Vymazanie profilovej fotky	                                                     ✅
+| Endpoint               | Metóda |  Popis                                                                        |  Auth  |
+|------------------------|--------|-------------------------------------------------------------------------------|--------|
+/api/user	                GET      Získa detaily prihláseného používateľa	                                          YES
+/api/user/update	        PUT	     Aktualizácia profilu (username, dátum narodenia, pohlavie, lokácia, atď.)	      YES
+/api/user/change-password	POST	 Zmena hesla používateľa	                                                      YES
+/api/user/profile-picture	POST     Upload profilovej fotky (file)	                                                  YES
+/api/user/profile-picture	DELETE   Vymazanie profilovej fotky	                                                      YES
 
 **Príklad response – GET /api/user:**
 ```json
@@ -65,14 +81,14 @@
 
 | Endpoint               | Metóda |  Popis                            | Auth |           ontent-Type          |
 |------------------------|--------|-----------------------------------|------|--------------------------------|
-/api/upload                 POST	 Upload obrázka (napr. k postu)	     ✅	        multipart/form-data
+/api/upload                 POST	 Upload obrázka (napr. k postu)	    YES	          multipart/form-data
 
 **Form-data parametre:**
 
-| Názov          |  Typ  |  Povinné     |                 Popis              |
+| Názov          |  Typ  |  Povinné     | Popis                              |
 |----------------|-------|--------------|------------------------------------|
-file	          File	      ✅	        Obrázok na upload
-post_id	          Integer	  ❌	        (voliteľne) priradenie k príspevku
+file	          File	      YES	      Obrázok na upload
+post_id	          Integer	  NO	      (voliteľne) priradenie k príspevku
 
 **Príklad response:**
 ```json
@@ -87,14 +103,14 @@ post_id	          Integer	  ❌	        (voliteľne) priradenie k príspevku
 
 ## 🧾 4. POSTS – CRUD systém
 
-| Endpoint               |  Metóda  |  Popis                                         | Auth |
-|------------------------|----------|------------------------------------------------|------|
-/api/posts	                 GET	   Zoznam všetkých príspevkov	                    ❌
-/api/posts/{id}	             GET	   Detail konkrétneho príspevku	                    ❌
-/api/my-posts	             GET	   Zoznam príspevkov prihláseného používateľa	    ✅
-/api/post-create	         POST	   Vytvorenie nového príspevku	                    ✅
-/api/post-update/{id}	     PUT	   Aktualizácia príspevku	                        ✅
-/api/post-delete/{id}	     DELETE	   Zmazanie príspevku (vrátane obrázkov)            ✅
+| Endpoint               |  Metóda  |  Popis                                         |  Auth  |
+|------------------------|----------|------------------------------------------------|--------|
+/api/posts	                 GET	   Zoznam všetkých príspevkov	                     NO
+/api/posts/{id}	             GET	   Detail konkrétneho príspevku	                     NO
+/api/my-posts	             GET	   Zoznam príspevkov prihláseného používateľa	     YES
+/api/post-create	         POST	   Vytvorenie nového príspevku	                     YES
+/api/post-update/{id}	     PUT	   Aktualizácia príspevku	                         YES
+/api/post-delete/{id}	     DELETE	   Zmazanie príspevku (vrátane obrázkov)             YES
 
 **Request – post-create:**
 ```json
@@ -136,7 +152,7 @@ post_id	          Integer	  ❌	        (voliteľne) priradenie k príspevku
 
 | Endpoint    |  Metóda  |  Popis                                         |  Auth  |
 |-------------|----------|------------------------------------------------|--------|
-/api/health	      GET	    Testovacie „ping“ pre monitoring / status	     ❌
+/api/health	      GET	    Testovacie „ping“ pre monitoring / status	      NO
 
 **Response:**
 ```json
